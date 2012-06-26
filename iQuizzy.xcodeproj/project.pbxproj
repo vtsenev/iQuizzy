@@ -1,0 +1,286 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A0D3AECE159A12B80037E6FE /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0D3AECD159A12B80037E6FE /* UIKit.framework */; };
+		A0D3AED0159A12B80037E6FE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0D3AECF159A12B80037E6FE /* Foundation.framework */; };
+		A0D3AED2159A12B80037E6FE /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0D3AED1159A12B80037E6FE /* CoreGraphics.framework */; };
+		A0D3AED8159A12B80037E6FE /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A0D3AED6159A12B80037E6FE /* InfoPlist.strings */; };
+		A0D3AEDA159A12B80037E6FE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A0D3AED9159A12B80037E6FE /* main.m */; };
+		A0D3AEDE159A12B80037E6FE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A0D3AEDD159A12B80037E6FE /* AppDelegate.m */; };
+		A0D3AEE1159A12B80037E6FE /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A0D3AEDF159A12B80037E6FE /* MainStoryboard.storyboard */; };
+		A0D3AEE4159A12B80037E6FE /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A0D3AEE3159A12B80037E6FE /* ViewController.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A0D3AEC9159A12B80037E6FE /* iQuizzy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iQuizzy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0D3AECD159A12B80037E6FE /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		A0D3AECF159A12B80037E6FE /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		A0D3AED1159A12B80037E6FE /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		A0D3AED5159A12B80037E6FE /* iQuizzy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iQuizzy-Info.plist"; sourceTree = "<group>"; };
+		A0D3AED7159A12B80037E6FE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A0D3AED9159A12B80037E6FE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		A0D3AEDB159A12B80037E6FE /* iQuizzy-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iQuizzy-Prefix.pch"; sourceTree = "<group>"; };
+		A0D3AEDC159A12B80037E6FE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		A0D3AEDD159A12B80037E6FE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		A0D3AEE0159A12B80037E6FE /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard.storyboard; sourceTree = "<group>"; };
+		A0D3AEE2159A12B80037E6FE /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		A0D3AEE3159A12B80037E6FE /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A0D3AEC6159A12B80037E6FE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0D3AECE159A12B80037E6FE /* UIKit.framework in Frameworks */,
+				A0D3AED0159A12B80037E6FE /* Foundation.framework in Frameworks */,
+				A0D3AED2159A12B80037E6FE /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A0D3AEBE159A12B80037E6FE = {
+			isa = PBXGroup;
+			children = (
+				A0D3AED3159A12B80037E6FE /* iQuizzy */,
+				A0D3AECC159A12B80037E6FE /* Frameworks */,
+				A0D3AECA159A12B80037E6FE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A0D3AECA159A12B80037E6FE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A0D3AEC9159A12B80037E6FE /* iQuizzy.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A0D3AECC159A12B80037E6FE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A0D3AECD159A12B80037E6FE /* UIKit.framework */,
+				A0D3AECF159A12B80037E6FE /* Foundation.framework */,
+				A0D3AED1159A12B80037E6FE /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A0D3AED3159A12B80037E6FE /* iQuizzy */ = {
+			isa = PBXGroup;
+			children = (
+				A0D3AEDC159A12B80037E6FE /* AppDelegate.h */,
+				A0D3AEDD159A12B80037E6FE /* AppDelegate.m */,
+				A0D3AEDF159A12B80037E6FE /* MainStoryboard.storyboard */,
+				A0D3AEE2159A12B80037E6FE /* ViewController.h */,
+				A0D3AEE3159A12B80037E6FE /* ViewController.m */,
+				A0D3AED4159A12B80037E6FE /* Supporting Files */,
+			);
+			path = iQuizzy;
+			sourceTree = "<group>";
+		};
+		A0D3AED4159A12B80037E6FE /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				A0D3AED5159A12B80037E6FE /* iQuizzy-Info.plist */,
+				A0D3AED6159A12B80037E6FE /* InfoPlist.strings */,
+				A0D3AED9159A12B80037E6FE /* main.m */,
+				A0D3AEDB159A12B80037E6FE /* iQuizzy-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A0D3AEC8159A12B80037E6FE /* iQuizzy */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A0D3AEE7159A12B80037E6FE /* Build configuration list for PBXNativeTarget "iQuizzy" */;
+			buildPhases = (
+				A0D3AEC5159A12B80037E6FE /* Sources */,
+				A0D3AEC6159A12B80037E6FE /* Frameworks */,
+				A0D3AEC7159A12B80037E6FE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = iQuizzy;
+			productName = iQuizzy;
+			productReference = A0D3AEC9159A12B80037E6FE /* iQuizzy.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A0D3AEC0159A12B80037E6FE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0440;
+				ORGANIZATIONNAME = "Vladimir Tsenev";
+			};
+			buildConfigurationList = A0D3AEC3159A12B80037E6FE /* Build configuration list for PBXProject "iQuizzy" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = A0D3AEBE159A12B80037E6FE;
+			productRefGroup = A0D3AECA159A12B80037E6FE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A0D3AEC8159A12B80037E6FE /* iQuizzy */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A0D3AEC7159A12B80037E6FE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0D3AED8159A12B80037E6FE /* InfoPlist.strings in Resources */,
+				A0D3AEE1159A12B80037E6FE /* MainStoryboard.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A0D3AEC5159A12B80037E6FE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A0D3AEDA159A12B80037E6FE /* main.m in Sources */,
+				A0D3AEDE159A12B80037E6FE /* AppDelegate.m in Sources */,
+				A0D3AEE4159A12B80037E6FE /* ViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		A0D3AED6159A12B80037E6FE /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A0D3AED7159A12B80037E6FE /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		A0D3AEDF159A12B80037E6FE /* MainStoryboard.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A0D3AEE0159A12B80037E6FE /* en */,
+			);
+			name = MainStoryboard.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		A0D3AEE5159A12B80037E6FE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		A0D3AEE6159A12B80037E6FE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A0D3AEE8159A12B80037E6FE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "iQuizzy/iQuizzy-Prefix.pch";
+				INFOPLIST_FILE = "iQuizzy/iQuizzy-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		A0D3AEE9159A12B80037E6FE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "iQuizzy/iQuizzy-Prefix.pch";
+				INFOPLIST_FILE = "iQuizzy/iQuizzy-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A0D3AEC3159A12B80037E6FE /* Build configuration list for PBXProject "iQuizzy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A0D3AEE5159A12B80037E6FE /* Debug */,
+				A0D3AEE6159A12B80037E6FE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A0D3AEE7159A12B80037E6FE /* Build configuration list for PBXNativeTarget "iQuizzy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A0D3AEE8159A12B80037E6FE /* Debug */,
+				A0D3AEE9159A12B80037E6FE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A0D3AEC0159A12B80037E6FE /* Project object */;
+}
