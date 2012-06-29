@@ -31,6 +31,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self.quizTitleField becomeFirstResponder];
 }
 
 - (void)viewDidUnload {
@@ -48,7 +49,6 @@
     if (![self.quizTitleField.text isEqualToString:[NSString string]]) {
         Quiz *quiz = [[Quiz alloc] init];
         quiz.title = self.quizTitleField.text;
-        quiz.userChoices = nil;
         
         if ([self.delegate respondsToSelector:@selector(addedNewQuiz:)]) {
             [self.delegate addedNewQuiz:quiz];

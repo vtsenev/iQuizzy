@@ -11,12 +11,12 @@
 
 @interface UserResponse : NSObject
 
-@property (nonatomic, strong) NSString *response;
-@property (nonatomic, strong) NSString *question;
+@property (nonatomic, strong) NSObject *answer;
+@property (nonatomic, strong) NSString *questionTextAndAnswerText;
+@property (nonatomic, strong) NSString *questionText;
 @property (nonatomic, strong) NSString *answerText;
 @property (nonatomic) NSInteger questionLevel;
 @property (nonatomic) NSInteger parentId;
 @property (nonatomic) NSInteger questionId;
-@property (nonatomic, strong) NSObject *answer;
 
 @end

@@ -22,5 +22,7 @@
 - (Answer *)fetchAnswerToSingleChoiceQuestion:(NSNumber *)questionId;
 - (NSArray *)fetchAnswersToMultipleChoiceQuestion:(NSNumber *)questionId;
 - (BOOL)areAllQuestionsAnsweredForSection:(NSString *)section;
+- (NSMutableDictionary *)fetchOpenQuestions;
+- (NSMutableDictionary *)fetchAnswersToQuestions;
 
 @end

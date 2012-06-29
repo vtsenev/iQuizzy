@@ -10,6 +10,7 @@
 #import "Answer.h"
 #import "DataManager.h"
 #import "Question.h"
+#import "Quiz.h"
 
 @interface AnswerTableViewController ()
 
@@ -27,6 +28,7 @@
 @synthesize chosenAnswers;
 @synthesize delegate;
 @synthesize question;
+@synthesize quiz;
 
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
@@ -135,7 +137,7 @@
 }
 
 - (void)selectOldAnswers {
-    UserChoices *userChoices = [DataManager defaultDataManager].userChoices;
+    UserChoices *userChoices = [[[DataManager defaultDataManager] quizToUserChoices] objectForKey:self.quiz.quizId];
     NSNumber *questionId = [NSNumber numberWithInt:self.question.questionId];
     BOOL isQuestionAnswered = [userChoices isQuestionAnswered:questionId];
     

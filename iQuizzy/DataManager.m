@@ -20,17 +20,17 @@ static DataManager *defaultDataManager = nil;
 @property (nonatomic) NSInteger currentLevel;
 
 - (void)initDB;
-
+- (NSString *)createEditableDatabase;
 - (void)fetchQuestionParents;
 - (NSInteger)getQuestionLevel:(NSInteger)questionId;
 
 @end
 
 @implementation DataManager
-@synthesize userChoices;
 @synthesize currentLevel;
 @synthesize questionIdsToQuestions;
 @synthesize quizes;
+@synthesize quizToUserChoices;
 
 # pragma mark - Singleton core implementation
 
@@ -60,6 +60,7 @@ static DataManager *defaultDataManager = nil;
     self = [super init];
     
     [self initDB];
+    self.quizToUserChoices = [NSMutableDictionary dictionary];
     
     return self;
 }
@@ -67,7 +68,7 @@ static DataManager *defaultDataManager = nil;
 # pragma mark - Database init close and request methods
 
 - (void)initDB {
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"QuizData" ofType:@"sqlite"];
+    NSString *path = [self createEditableDatabase];
     
     if (sqlite3_open([path UTF8String], &database) == SQLITE_OK) {
         NSLog(@"Opening database");
@@ -81,6 +82,38 @@ static DataManager *defaultDataManager = nil;
     if (sqlite3_close(database) != SQLITE_OK) {
         NSAssert1(0, @"Error: failed to close database: ‘%s’.", sqlite3_errmsg(database));
     }
+}
+
+- (NSString *)createEditableDatabase {
+    // Check to see if editable database already exists
+    BOOL success;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSError *error;
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDir = [paths objectAtIndex:0];
+    NSString *writableDB = [documentsDir stringByAppendingPathComponent:@"QuizData.sqlite"];
+    success = [fileManager fileExistsAtPath:writableDB];
+    // The editable database already exists
+    if (success) {
+        NSLog(@"%@", writableDB);
+        NSLog(@"Success... writable database found");
+        return writableDB;
+    }
+    
+    // The editable database does not exist
+    // Copy the default DB to the application Documents directory.
+    NSString *defaultPath = [[NSBundle mainBundle] pathForResource:@"QuizData" ofType:@"sqlite"];
+    success = [fileManager copyItemAtPath:defaultPath toPath:writableDB error:&error];
+    if (!success) {
+        NSLog(@"Failed to create writable database file");
+        NSAssert1(0, @"Failed to create writable database file:'%@'.", [error localizedDescription]);
+        return nil;
+    }
+    
+    if([fileManager fileExistsAtPath:writableDB]){
+        NSLog(@"Writable copy if DB exist");
+    }
+    return writableDB;
 }
 
 - (NSDictionary *)fetchAllQuestions {
@@ -213,10 +246,6 @@ static DataManager *defaultDataManager = nil;
 }
 
 - (NSArray *)fetchSections {
-    if (userChoices == nil) {
-        userChoices = [[UserChoices alloc] init];
-    }
-    
     NSMutableArray *result = [[NSMutableArray alloc] init];
     
     sqlite3_stmt *statement;
@@ -261,8 +290,7 @@ static DataManager *defaultDataManager = nil;
 }
 
 - (NSArray *)fetchQuizes {
-    # warning sqlRequest show be updated
-    const char *sqlRequest = "SELECT Quiz.Title, Quiz.QuizId FROM Quiz";
+    const char *sqlRequest = "SELECT Quiz.QuizTitle, Quiz.QuizId FROM Quiz";
     
     sqlite3_stmt *statement;
     int sqlResult = sqlite3_prepare_v2(database, sqlRequest, -1, &statement, NULL);
@@ -272,8 +300,8 @@ static DataManager *defaultDataManager = nil;
         while (sqlite3_step(statement) == SQLITE_ROW) {
             Quiz *quiz = [[Quiz alloc] init];
             
-            char *questionText = (char *)sqlite3_column_text(statement, 0);
-            quiz.title = (questionText) ? [NSString stringWithUTF8String:questionText] : @"";
+            char *quizTitle = (char *)sqlite3_column_text(statement, 0);
+            quiz.title = (quizTitle) ? [NSString stringWithUTF8String:quizTitle] : @"";
             NSInteger quizId = sqlite3_column_int(statement, 1);
             quiz.quizId = [NSNumber numberWithInt:quizId];
             
@@ -286,6 +314,178 @@ static DataManager *defaultDataManager = nil;
     }
     
     return allQuizes;
+}
+
+- (void)fetchUserResponsesForQuizWithId:(NSNumber *)quizId {
+    UserChoices *userChoices = [self.quizToUserChoices objectForKey:quizId];
+    if (!userChoices) {
+        userChoices = [[UserChoices alloc] init];
+        [self.quizToUserChoices setObject:userChoices forKey:quizId];
+    }
+    NSMutableDictionary *multipleChoiceQuestionIdToAnswers = [[NSMutableDictionary alloc] init];
+    
+    NSString *sqlReqStr = [NSString stringWithFormat:@"SELECT AnswerId, Answer, QuestionText, QuestionType, QuestionId, SectionText from AnswersForQuestionsView where QuizId = %@", quizId];
+    const char *sqlRequest = [sqlReqStr UTF8String];
+    
+    sqlite3_stmt *statement;
+    int sqlResult = sqlite3_prepare_v2(database, sqlRequest, -1, &statement, NULL);
+    
+    if (sqlResult == SQLITE_OK) {
+        while (sqlite3_step(statement) == SQLITE_ROW) {
+            Answer * answer = [[Answer alloc] init];
+            answer.answerId = sqlite3_column_int(statement, 0);
+            char *answText = (char *)sqlite3_column_text(statement, 1);
+            answer.answerText = [NSString stringWithUTF8String:answText];
+            
+            Question *question = [[Question alloc] init];
+            char *questionText = (char *)sqlite3_column_text(statement, 2);
+            question.questionText = [NSString stringWithUTF8String:questionText];
+            question.questionType =  sqlite3_column_int(statement, 3);
+            question.questionId =  sqlite3_column_int(statement, 4);
+            char *sectionText = (char *)sqlite3_column_text(statement, 5);
+            question.questionSection = [NSString stringWithUTF8String:sectionText];
+
+            NSNumber *questionId = [NSNumber numberWithInt:question.questionId];
+            if(question.questionType == 0 || question.questionType == 2) {
+                [userChoices addAnswer:answer toSingleChoiceQuestion:questionId];
+            } else if (question.questionType == 1) {
+                NSMutableArray *answersForQuestion = [multipleChoiceQuestionIdToAnswers objectForKey:questionId];
+                if (answersForQuestion) {
+                    [answersForQuestion addObject:answer];
+                } else {
+                    [multipleChoiceQuestionIdToAnswers setObject:[[NSMutableArray alloc] initWithObjects:answer, nil] forKey:questionId];
+                }
+            }
+        }
+        sqlite3_finalize(statement);
+    } else {
+        NSLog(@"Problem with the database:");
+        NSLog(@"%d", sqlResult);
+    }
+    
+    NSArray *multipleChoiceQuestions = [multipleChoiceQuestionIdToAnswers allKeys];
+    for (NSNumber *questionId in multipleChoiceQuestions) {
+        NSArray *answers = [multipleChoiceQuestionIdToAnswers objectForKey:questionId];
+        [userChoices addAnswers:answers toMultipleChoiceQuestion:questionId];
+    }
+    
+}
+
+# pragma mark - Insert data into database
+
+- (void)insertQuiz:(Quiz *)quiz {
+    sqlite3_stmt *statement;
+    NSString *insertSQL = [NSString stringWithFormat:@"INSERT INTO Quiz (QuizTitle) VALUES (\"%@\")", quiz.title];
+    const char *insert_stmt = [insertSQL UTF8String];
+    int sqlResult = sqlite3_prepare_v2(database, insert_stmt, -1, &statement, NULL);
+    
+    int quizId = -1;
+    
+    if (sqlResult == SQLITE_OK) {
+        if (sqlite3_step(statement) == SQLITE_DONE) {
+            NSLog(@"Quiz added");
+            quizId = sqlite3_last_insert_rowid(database);
+            quiz.quizId = [NSNumber numberWithInt:quizId];
+        } else {
+            NSLog(@"Failed to add");
+        }
+    } else {
+        NSLog(@"Problem with the database:");
+        NSLog(@"%d", sqlResult);
+    }
+    sqlite3_finalize(statement);
+    
+    UserChoices *userChoices = [[UserChoices alloc] init];
+    [self.quizToUserChoices setObject:userChoices forKey:quiz.quizId];
+}
+
+- (NSInteger)insertAnswer:(Answer *)answer {
+    sqlite3_stmt *statement;
+    NSString *insertSQL = [NSString stringWithFormat:@"INSERT INTO Answer(Answer)  VALUES (\"%@\")", answer.answerText];
+    const char *insert_stmt = [insertSQL UTF8String];
+    int sqlResult = sqlite3_prepare_v2(database, insert_stmt, -1, &statement, NULL);
+    int answerId = -1;
+    
+    if (sqlResult == SQLITE_OK) {
+        if (sqlite3_step(statement) == SQLITE_DONE) {
+            NSLog(@"Answer added");
+            answerId = sqlite3_last_insert_rowid(database);
+        } else {
+            NSLog(@"Failed to add answer");
+        }
+    } else {
+        NSLog(@"Problem with the database:");
+        NSLog(@"%d", sqlResult);
+    }
+    sqlite3_finalize(statement);
+    
+    return answerId;
+}
+
+- (NSInteger)insertAnsweredQuestion:(Question *)question forQuizId:(NSNumber *)quizId {
+    sqlite3_stmt *statement;
+    NSString *insertSQL = [NSString stringWithFormat:@"INSERT INTO QuizQuestionsWithAnswers(QuestionId, QuizId)  VALUES (\"%d\", \"%@\")", question.questionId, quizId];
+    const char *insert_stmt = [insertSQL UTF8String];
+    int sqlResult = sqlite3_prepare_v2(database, insert_stmt, -1, &statement, NULL);
+    
+    NSInteger answeredQuestionId = -1;
+    
+    if (sqlResult == SQLITE_OK) {
+        if (sqlite3_step(statement) == SQLITE_DONE) {
+            NSLog(@"Answered Question added");
+            answeredQuestionId = sqlite3_last_insert_rowid(database);
+        } else {
+            NSLog(@"Failed to add Answered Question");
+        }
+    } else {
+        NSLog(@"Problem with the database:");
+        NSLog(@"%d", sqlResult);
+    }
+    sqlite3_finalize(statement);
+    
+    return answeredQuestionId;
+}
+
+- (void)insertAnswer:(Answer *)answer forQuestion:(Question *)question forQuizId:(NSNumber *)quizId {
+    NSInteger answerForQuestionId = [self insertAnsweredQuestion:question forQuizId:quizId];
+    
+    sqlite3_stmt *statement;
+    NSString *insertSQL = [NSString stringWithFormat:@"INSERT INTO AnswerForQuestion(AnswerForQuestionId, AnswerId)  VALUES (\"%d\", \"%d\")", answerForQuestionId, answer.answerId];
+    const char *insert_stmt = [insertSQL UTF8String];
+    int sqlResult = sqlite3_prepare_v2(database, insert_stmt, -1, &statement, NULL);
+    
+    if (sqlResult == SQLITE_OK) {
+        if (sqlite3_step(statement) == SQLITE_DONE) {
+            NSLog(@"Answer for Question added");
+        } else {
+            NSLog(@"Failed to add Answer for Question");
+        }
+    } else {
+        NSLog(@"Problem with the database:");
+        NSLog(@"%d", sqlResult);
+    }
+    sqlite3_finalize(statement);
+}
+
+# pragma mark - Delete data from database
+
+- (void)deleteQuizWithId:(NSNumber *)quizId {
+    sqlite3_stmt *statement;
+    NSString *deleteSQL = [NSString stringWithFormat:@"DELETE FROM Quiz WHERE QuizId = %@", quizId];
+    const char *delete_stmt = [deleteSQL UTF8String];
+    int sqlResult = sqlite3_prepare_v2(database, delete_stmt, -1, &statement, NULL);
+    
+    if (sqlResult == SQLITE_OK) {
+        if (sqlite3_step(statement) == SQLITE_DONE) {
+            NSLog(@"Quiz deleted");
+        } else {
+            NSLog(@"Failed to delete");
+        }
+    } else {
+        NSLog(@"Problem with the database:");
+        NSLog(@"%d", sqlResult);
+    }
+    sqlite3_finalize(statement);
 }
 
 # pragma mark - Add user response and sort responses
@@ -312,18 +512,21 @@ static DataManager *defaultDataManager = nil;
     return categorizedQuestions;
 }
 
-- (void)addAnswers:(NSObject *)answerObject forQuestion:(NSNumber *)questionId {
+- (void)addAnswers:(NSObject *)answerObject forQuestion:(NSNumber *)questionId forQuizId:(NSNumber *)quizId {
+    UserChoices *userChoices = [self.quizToUserChoices objectForKey:quizId];
+    
     if ([answerObject isKindOfClass:[Answer class]]) {
         Answer *answer = (Answer *)answerObject;
-        [self.userChoices addAnswer:answer toSingleChoiceQuestion:questionId];
+        [userChoices addAnswer:answer toSingleChoiceQuestion:questionId];
     } else if ([answerObject isKindOfClass:[NSArray class]]) {
         NSArray *answers = (NSArray *)answerObject;
-        [self.userChoices addAnswers:answers toMultipleChoiceQuestion:questionId];
+        [userChoices addAnswers:answers toMultipleChoiceQuestion:questionId];
     }
 }
 
-- (NSString *)composeEmailBody {
-    return [self.userChoices prepareEmailBody];
+- (NSString *)composeEmailBodyForQuizWithId:(NSNumber *)quizId {
+    UserChoices *userChoices = [self.quizToUserChoices objectForKey:quizId];
+    return [userChoices prepareEmailBody];
 }
 
 - (NSDictionary *)createQuestionTree {

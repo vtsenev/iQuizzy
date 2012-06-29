@@ -11,7 +11,6 @@
 @implementation Quiz
 
 @synthesize title;
-@synthesize userChoices;
 @synthesize quizId;
 
 @end

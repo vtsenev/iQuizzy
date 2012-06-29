@@ -10,9 +10,9 @@
 
 @implementation UserResponse
 
-@synthesize response;
+@synthesize questionTextAndAnswerText;
 @synthesize questionLevel;
-@synthesize question;
+@synthesize questionText;
 @synthesize answerText;
 @synthesize parentId;
 @synthesize questionId;

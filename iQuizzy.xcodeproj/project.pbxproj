@@ -12,6 +12,8 @@
 		A044E4FB159CAA1000A6011B /* QuizesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A044E4FA159CAA1000A6011B /* QuizesTableViewController.m */; };
 		A044E4FE159CAAF900A6011B /* Quiz.m in Sources */ = {isa = PBXBuildFile; fileRef = A044E4FD159CAAF800A6011B /* Quiz.m */; };
 		A044E501159CABE200A6011B /* AddQuizViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A044E500159CABE200A6011B /* AddQuizViewController.m */; };
+		A056788D159DB63000EC0DA7 /* QuizData.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = A056788C159DB63000EC0DA7 /* QuizData.sqlite */; };
+		A0567890159DCBBB00EC0DA7 /* QuizData.m in Sources */ = {isa = PBXBuildFile; fileRef = A056788F159DCBBB00EC0DA7 /* QuizData.m */; };
 		A0D3AECE159A12B80037E6FE /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0D3AECD159A12B80037E6FE /* UIKit.framework */; };
 		A0D3AED0159A12B80037E6FE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0D3AECF159A12B80037E6FE /* Foundation.framework */; };
 		A0D3AED2159A12B80037E6FE /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0D3AED1159A12B80037E6FE /* CoreGraphics.framework */; };
@@ -26,7 +28,6 @@
 		A0EA8CC3159B1D0B00A16570 /* DataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A0EA8CBC159B1D0B00A16570 /* DataManager.m */; };
 		A0EA8CC4159B1D0B00A16570 /* UserChoices.m in Sources */ = {isa = PBXBuildFile; fileRef = A0EA8CBE159B1D0B00A16570 /* UserChoices.m */; };
 		A0EA8CC5159B1D0B00A16570 /* UserResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = A0EA8CC0159B1D0B00A16570 /* UserResponse.m */; };
-		A0EA8CC7159B1D2100A16570 /* QuizData.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = A0EA8CC6159B1D2100A16570 /* QuizData.sqlite */; };
 		A0EA8CCE159B1D8100A16570 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0EA8CCD159B1D8100A16570 /* MessageUI.framework */; };
 		A0EA8CD0159B1D9300A16570 /* libsqlite3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A0EA8CCF159B1D9300A16570 /* libsqlite3.0.dylib */; };
 		A0EA8CD4159B1E5200A16570 /* TextChoiceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A0EA8CD3159B1E5200A16570 /* TextChoiceViewController.m */; };
@@ -45,6 +46,9 @@
 		A044E4FF159CABE200A6011B /* AddQuizViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddQuizViewController.h; sourceTree = "<group>"; };
 		A044E500159CABE200A6011B /* AddQuizViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddQuizViewController.m; sourceTree = "<group>"; };
 		A044E502159CAD4E00A6011B /* QuizDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QuizDelegate.h; sourceTree = "<group>"; };
+		A056788C159DB63000EC0DA7 /* QuizData.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = QuizData.sqlite; sourceTree = "<group>"; };
+		A056788E159DCBBB00EC0DA7 /* QuizData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuizData.h; sourceTree = "<group>"; };
+		A056788F159DCBBB00EC0DA7 /* QuizData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QuizData.m; sourceTree = "<group>"; };
 		A0D3AEC9159A12B80037E6FE /* iQuizzy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iQuizzy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0D3AECD159A12B80037E6FE /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		A0D3AECF159A12B80037E6FE /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -70,7 +74,6 @@
 		A0EA8CBE159B1D0B00A16570 /* UserChoices.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserChoices.m; sourceTree = "<group>"; };
 		A0EA8CBF159B1D0B00A16570 /* UserResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserResponse.h; sourceTree = "<group>"; };
 		A0EA8CC0159B1D0B00A16570 /* UserResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserResponse.m; sourceTree = "<group>"; };
-		A0EA8CC6159B1D2100A16570 /* QuizData.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = QuizData.sqlite; sourceTree = "<group>"; };
 		A0EA8CCC159B1D5000A16570 /* AnswerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnswerDelegate.h; sourceTree = "<group>"; };
 		A0EA8CCD159B1D8100A16570 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		A0EA8CCF159B1D9300A16570 /* libsqlite3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.0.dylib; path = usr/lib/libsqlite3.0.dylib; sourceTree = SDKROOT; };
@@ -129,7 +132,7 @@
 		A0D3AED3159A12B80037E6FE /* iQuizzy */ = {
 			isa = PBXGroup;
 			children = (
-				A0EA8CC6159B1D2100A16570 /* QuizData.sqlite */,
+				A056788C159DB63000EC0DA7 /* QuizData.sqlite */,
 				A0D3AEDC159A12B80037E6FE /* AppDelegate.h */,
 				A0D3AEDD159A12B80037E6FE /* AppDelegate.m */,
 				A0EA8CCC159B1D5000A16570 /* AnswerDelegate.h */,
@@ -172,6 +175,8 @@
 				A0EA8CC0159B1D0B00A16570 /* UserResponse.m */,
 				A044E4FC159CAAF800A6011B /* Quiz.h */,
 				A044E4FD159CAAF800A6011B /* Quiz.m */,
+				A056788E159DCBBB00EC0DA7 /* QuizData.h */,
+				A056788F159DCBBB00EC0DA7 /* QuizData.m */,
 			);
 			name = "Data Manager";
 			sourceTree = "<group>";
@@ -248,10 +253,10 @@
 			files = (
 				A0D3AED8159A12B80037E6FE /* InfoPlist.strings in Resources */,
 				A0D3AEE1159A12B80037E6FE /* MainStoryboard.storyboard in Resources */,
-				A0EA8CC7159B1D2100A16570 /* QuizData.sqlite in Resources */,
 				A0EA8CD9159B218200A16570 /* Question.png in Resources */,
 				A044E4F4159C998700A6011B /* tick.png in Resources */,
 				A044E4F8159C9A4B00A6011B /* question_mark.png in Resources */,
+				A056788D159DB63000EC0DA7 /* QuizData.sqlite in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,6 +281,7 @@
 				A044E4FB159CAA1000A6011B /* QuizesTableViewController.m in Sources */,
 				A044E4FE159CAAF900A6011B /* Quiz.m in Sources */,
 				A044E501159CABE200A6011B /* AddQuizViewController.m in Sources */,
+				A0567890159DCBBB00EC0DA7 /* QuizData.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

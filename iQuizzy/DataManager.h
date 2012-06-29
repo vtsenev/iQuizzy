@@ -11,11 +11,13 @@
 #import "Answer.h"
 #import "UserChoices.h"
 
+@class Quiz;
+
 @interface DataManager : NSObject
 
-@property (nonatomic, strong) UserChoices *userChoices;
 @property (nonatomic, strong) NSMutableArray *quizes;
 @property (nonatomic, strong) NSDictionary *questionIdsToQuestions;
+@property (nonatomic, strong) NSMutableDictionary *quizToUserChoices;
 
 + (DataManager *)defaultDataManager;
 
@@ -27,9 +29,17 @@
 - (NSArray *)fetchAnswersForQuestion:(Question *)question;
 - (NSArray *)categorizeQuestions:(NSArray *)questions;
 - (NSArray *)fetchSections;
-- (void)addAnswers:(NSObject *)answerObject forQuestion:(NSNumber *)questionId;
-- (NSString *)composeEmailBody;
+- (void)fetchUserResponsesForQuizWithId:(NSNumber *)quizId;
+
+- (void)addAnswers:(NSObject *)answerObject forQuestion:(NSNumber *)questionId forQuizId:(NSNumber *)quizId;
+- (NSString *)composeEmailBodyForQuizWithId:(NSNumber *)quizId;
 - (NSDictionary *)createQuestionTree;
+
+- (void)insertQuiz:(Quiz *)quiz;
+- (NSInteger)insertAnswer:(Answer *)answer;
+- (void)insertAnswer:(Answer *)answer forQuestion:(Question *)question forQuizId:(NSNumber *)quizId;
+
+- (void)deleteQuizWithId:(NSNumber *)quizId;
 
 - (void)closeDB;
 

@@ -8,8 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import "AnswerDelegate.h"
-
 @class Question;
+@class Quiz;
 
 @interface AnswerTableViewController : UITableViewController
 
@@ -17,5 +17,6 @@
 @property (nonatomic, strong) Question *question;
 @property (nonatomic) BOOL isQuestionSingleChoice;
 @property (nonatomic, weak) id<AnswerDelegate> delegate;
+@property (nonatomic, strong) Quiz *quiz;
 
 @end

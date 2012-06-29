@@ -9,6 +9,7 @@
 #import "TextChoiceViewController.h"
 #import "Answer.h"
 #import "DataManager.h"
+#import "Quiz.h"
 
 @interface TextChoiceViewController ()
 
@@ -17,7 +18,6 @@
 @property (strong, nonatomic) IBOutlet UITextView *answerTextView;
 
 - (void)getPreviousAnswer;
-- (IBAction)cancelTextChoice:(id)sender;
 - (IBAction)submitTextChoice:(id)sender;
 
 @end
@@ -29,6 +29,7 @@
 @synthesize question;
 @synthesize delegate;
 @synthesize contentView;
+@synthesize quiz;
 
 - (void)viewDidUnload {
     [self setAnswerTextView:nil];
@@ -37,6 +38,7 @@
     [self setDelegate:nil];
     [self setContentView:nil];
     [self setAnswerTextView:nil];
+    [self setQuiz:nil];
     [super viewDidUnload];
 }
 
@@ -76,14 +78,13 @@
 
 #pragma mark - IBAction Methods
 
-- (IBAction)cancelTextChoice:(id)sender {
-    [self.navigationController popViewControllerAnimated:YES];
-}
-
 - (IBAction)submitTextChoice:(id)sender {
     Answer *answer = [[Answer alloc] init];
-    answer.answerId = NSIntegerMax;
+
     answer.answerText = self.answerTextView.text;
+    answer.answerId = [[DataManager defaultDataManager] insertAnswer:answer];
+    
+    [[DataManager defaultDataManager] insertAnswer:answer forQuestion:self.question forQuizId:quiz.quizId];
 
     if([self.delegate respondsToSelector:@selector(didSubmitTextAnswer:forQuestion:)]) {
         [self.delegate didSubmitTextAnswer:answer forQuestion:self.question];
@@ -110,7 +111,7 @@
 }
 
 - (void)getPreviousAnswer {
-    UserChoices *userChoices = [DataManager defaultDataManager].userChoices;
+    UserChoices *userChoices = [[[DataManager defaultDataManager] quizToUserChoices] objectForKey:self.quiz.quizId];
     NSNumber *questionId = [NSNumber numberWithInt:self.question.questionId];
     BOOL isQuestionAnswered = [userChoices isQuestionAnswered:questionId];
     

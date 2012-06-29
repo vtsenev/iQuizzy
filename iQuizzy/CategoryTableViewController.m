@@ -19,6 +19,7 @@
 @property (nonatomic, strong) NSMutableDictionary *answersForSection;
 
 - (IBAction)sendEmail;
+- (void)initializeQuestionsAndAnswers;
 
 @end
 
@@ -47,8 +48,8 @@
     [super viewDidLoad];
     
     self.tableData = [[DataManager defaultDataManager] fetchSections];
-    self.openQuestions = [NSMutableDictionary dictionary];
-    self.answersForSection = [NSMutableDictionary dictionary];
+    [self initializeQuestionsAndAnswers];
+    [self.navigationItem setTitle:self.quiz.title];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -79,7 +80,7 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
     NSString *section = [self.tableData objectAtIndex:[indexPath row]];
-    UserChoices *userChoices = [DataManager defaultDataManager].userChoices;
+    UserChoices *userChoices = [[[DataManager defaultDataManager] quizToUserChoices] objectForKey:self.quiz.quizId];
     BOOL areAllQuestionsAnswered = [userChoices areAllQuestionsAnsweredForSection:section];
     if (areAllQuestionsAnswered) {
         [cell.imageView setImage:[UIImage imageNamed:@"tick"]];
@@ -103,6 +104,7 @@
         NSString *section = [self.tableData objectAtIndex:[self.tableView indexPathForSelectedRow].row];
         questionsTableViewController.title = section;
         questionsTableViewController.delegate = self;
+        questionsTableViewController.quiz = self.quiz;
 
         NSArray *questions = [self.openQuestions valueForKey:section];
         if (questions) {
@@ -143,7 +145,7 @@
         MFMailComposeViewController *mailer = [[MFMailComposeViewController alloc] init];
         mailer.mailComposeDelegate = self;
         
-        NSString *messageBody = [[DataManager defaultDataManager] composeEmailBody];
+        NSString *messageBody = [[DataManager defaultDataManager] composeEmailBodyForQuizWithId:self.quiz.quizId];
         [mailer setMessageBody:messageBody isHTML:NO];
         
         [self presentModalViewController:mailer animated:YES];
@@ -155,6 +157,25 @@
                           cancelButtonTitle:@"OK"
                           otherButtonTitles:nil] show];
     }
+}
+
+- (void)initializeQuestionsAndAnswers {
+    UserChoices *userChoices = [[[DataManager defaultDataManager] quizToUserChoices] objectForKey:self.quiz.quizId];
+    
+    if (userChoices) {
+        NSMutableDictionary *testDict = userChoices.questionAndAnswers;
+        NSArray *keys = [testDict allKeys];
+        for (NSNumber *qId in keys) {
+            NSLog(@"questionId = %@, answer = %@", qId, [testDict objectForKey:qId]);
+        }
+        
+        self.openQuestions = [userChoices fetchOpenQuestions];
+        self.answersForSection = [userChoices fetchAnswersToQuestions];
+    } else {
+        self.openQuestions = [NSMutableDictionary dictionary];
+        self.answersForSection = [NSMutableDictionary dictionary];
+    }
+    
 }
 
 #pragma mark - QuestionDelegate Methods

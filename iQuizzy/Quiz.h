@@ -7,12 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "UserChoices.h"
+#import "QuizData.h"
 
 @interface Quiz : NSObject
 
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, strong) NSNumber *quizId;
-@property (nonatomic, strong) UserChoices *userChoices;
 
 @end

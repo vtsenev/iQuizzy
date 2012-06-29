@@ -11,6 +11,7 @@
 #import "CategoryTableViewController.h"
 #import "QuizDelegate.h"
 #import "Quiz.h"
+#import "DataManager.h"
 
 @interface QuizesTableViewController () <QuizDelegate>
 
@@ -33,7 +34,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.tableData = [NSMutableArray array];
+    self.tableData = [NSMutableArray arrayWithArray:[[DataManager defaultDataManager] fetchQuizes]];
+//    self.tableData = [NSMutableArray array];
 }
 
 - (void)viewDidUnload {
@@ -67,6 +69,8 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
+        Quiz *quiz = [self.tableData objectAtIndex:[indexPath row]];
+        [[DataManager defaultDataManager] deleteQuizWithId:quiz.quizId];
         [self.tableData removeObjectAtIndex:[indexPath row]];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
     }
@@ -85,7 +89,10 @@
         AddQuizViewController *addQuizViewController = [segue destinationViewController];
         addQuizViewController.delegate = self;
     } else if ([[segue identifier] isEqualToString:@"quizToCategory"]) {
-        //        CategoryTableViewController *categoryTableViewController = [segue destinationViewController];
+        CategoryTableViewController *categoryTableViewController = [segue destinationViewController];
+        Quiz *quiz = [self.tableData objectAtIndex:[self.tableView indexPathForSelectedRow].row];
+        categoryTableViewController.quiz = quiz;
+        [[DataManager defaultDataManager] fetchUserResponsesForQuizWithId:quiz.quizId];
     }
 }
 
@@ -93,6 +100,7 @@
 
 - (void)addedNewQuiz:(Quiz *)quiz {
     if ([self isQuizTitleUnique:quiz.title]) {
+        [[DataManager defaultDataManager] insertQuiz:quiz];
         [self.tableData addObject:quiz];
         [self.tableView reloadData];
     } else {

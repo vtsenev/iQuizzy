@@ -11,6 +11,7 @@
 #import "AnswerDelegate.h"
 #import "AnswerTableViewController.h"
 #import "TextChoiceViewController.h"
+#import "Quiz.h"
 
 @interface QuestionsTableViewController () <AnswerDelegate>
 
@@ -31,13 +32,16 @@
 @synthesize questionDict;
 @synthesize delegate;
 @synthesize willGoBackToRootView;
+@synthesize quiz;
 
 - (void)viewDidUnload {
-    [super viewDidUnload];
+    
     [self setTitle:nil];
     [self setAnswers:nil];
     [self setTableData:nil];
     [self setQuestionDict:nil];
+    [self setQuiz:nil];
+    [super viewDidUnload];
 }
 
 - (id)initWithStyle:(UITableViewStyle)style {
@@ -110,7 +114,8 @@
     
     [cell.textLabel setText:question.questionText];
     
-    if ([[[DataManager defaultDataManager] userChoices] isQuestionAnswered:[NSNumber numberWithInt:question.questionId]]) {
+    UserChoices *userChoices = [[[DataManager defaultDataManager] quizToUserChoices] objectForKey:self.quiz.quizId];
+    if ([userChoices isQuestionAnswered:[NSNumber numberWithInt:question.questionId]]) {
         cell.detailTextLabel.text = [self.answers valueForKey:question.questionText];
     } else {
         cell.detailTextLabel.text = @"";
@@ -155,10 +160,12 @@
         answerTableViewController.answers = [[DataManager defaultDataManager] fetchAnswersForQuestion:q];
         answerTableViewController.question = q;
         answerTableViewController.delegate = self;
+        answerTableViewController.quiz = self.quiz;
     } else if ([[segue identifier] isEqualToString:@"questionWithTextAnswer"]) {
         TextChoiceViewController *textChoiceViewController = [segue destinationViewController];
         textChoiceViewController.question = q;
         textChoiceViewController.delegate = self;
+        textChoiceViewController.quiz = self.quiz;
     }
 }
 
@@ -169,14 +176,21 @@
         [self removeAllSubquestionsOfQuestion:question];
     }
     
-    [[DataManager defaultDataManager] addAnswers:answerObject forQuestion:[NSNumber numberWithInt:question.questionId]];
+    [[DataManager defaultDataManager] addAnswers:answerObject forQuestion:[NSNumber numberWithInt:question.questionId] forQuizId:self.quiz.quizId];
     
     if (question.questionType == 0) {
-        [self.answers setValue:((Answer *)answerObject).answerText forKey:question.questionText];
+        Answer *answer = (Answer *)answerObject;
+        [self.answers setValue:answer.answerText forKey:question.questionText];
+        
+        [[DataManager defaultDataManager] insertAnswer:answer forQuestion:question forQuizId:self.quiz.quizId];
     } else if (question.questionType == 1) {
         NSArray *theAnswers = (NSArray *)answerObject;
         NSString *concatenatedAnswers = [theAnswers componentsJoinedByString: @", "];
         [self.answers setValue:concatenatedAnswers forKey:question.questionText];
+        
+        for (Answer *a in theAnswers) {
+            [[DataManager defaultDataManager] insertAnswer:a forQuestion:question forQuizId:self.quiz.quizId];
+        }
     }
     
     NSUInteger index = self.questionIndex + 1;
@@ -189,7 +203,7 @@
 }
 
 - (void)didSubmitTextAnswer:(Answer *)textAnswer forQuestion:(Question *)question {
-    [[DataManager defaultDataManager] addAnswers:textAnswer forQuestion:[NSNumber numberWithInt:question.questionId]];
+    [[DataManager defaultDataManager] addAnswers:textAnswer forQuestion:[NSNumber numberWithInt:question.questionId] forQuizId:self.quiz.quizId];
     [self.answers setValue:textAnswer.answerText forKey:question.questionText];
     
     [self.tableView reloadData];
