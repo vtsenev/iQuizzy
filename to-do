@@ -1,0 +1,9 @@
+to-do
+
+- adding a multiple choice question doesn't work properly... forgets answers of subquestions
+
+for documentation purposes:
+
+questionType = 0 - singleChoice question
+questionType = 1 - multipleChoice question
+questionType = 2 - question with a text answer
