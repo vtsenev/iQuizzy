@@ -91,8 +91,9 @@
     } else if ([[segue identifier] isEqualToString:@"quizToCategory"]) {
         CategoryTableViewController *categoryTableViewController = [segue destinationViewController];
         Quiz *quiz = [self.tableData objectAtIndex:[self.tableView indexPathForSelectedRow].row];
-        categoryTableViewController.quiz = quiz;
         [[DataManager defaultDataManager] fetchUserResponsesForQuizWithId:quiz.quizId];
+        NSLog(@"QuizesTableViewController::QuizToUserChoices\n%@", [[[[DataManager defaultDataManager] quizToUserChoices] objectForKey:quiz.quizId] questionAndAnswers]);
+        categoryTableViewController.quiz = quiz;
     }
 }
 

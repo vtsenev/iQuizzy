@@ -1,4 +1,4 @@
-//
+            //
 //  DataManager.m
 //  Quizzy
 //
@@ -321,6 +321,7 @@ static DataManager *defaultDataManager = nil;
 
 - (void)fetchUserResponsesForQuizWithId:(NSNumber *)quizId {
     UserChoices *userChoices = [self.quizToUserChoices objectForKey:quizId];
+    NSLog(@"DataManager::fetchUserResponsesForQuizWithId\n%@", [userChoices questionAndAnswers]);
     if (!userChoices) {
         userChoices = [[UserChoices alloc] init];
         [self.quizToUserChoices setObject:userChoices forKey:quizId];
@@ -372,6 +373,8 @@ static DataManager *defaultDataManager = nil;
         [userChoices addAnswers:answers toMultipleChoiceQuestion:questionId];
     }
     
+    NSLog(@"DataManager::QuizToUserChoices\n%@", [[self.quizToUserChoices objectForKey:quizId] questionAndAnswers]);
+        
 }
 
 
@@ -427,12 +430,12 @@ static DataManager *defaultDataManager = nil;
 }
 
 - (NSInteger)insertAnsweredQuestion:(Question *)question forQuizId:(NSNumber *)quizId {
+
     sqlite3_stmt *statement;
-//    UserChoices *userChoices = [self.quizToUserChoices objectForKey:quizId];
     NSInteger answeredQuestionId = -1;
     NSString* queryStr;
-//    BOOL isQuestionAnswered = [userChoices isQuestionAnswered:[NSNumber numberWithInt:question.questionId]];
     BOOL isQuestionAnswered = [self isQuestionId:question.questionId andQuizId:[quizId intValue]];
+    
     if(!isQuestionAnswered )
     {
         queryStr = [NSString stringWithFormat:@"INSERT INTO QuizQuestionsWithAnswers(QuestionId, QuizId)  VALUES (\"%d\", \"%@\")", question.questionId, quizId];
@@ -453,7 +456,6 @@ static DataManager *defaultDataManager = nil;
                 NSLog(@"Problem with the database:");
                 NSLog(@"%d", sqlResult);
             }
-            
         }
         else {
             while (sqlite3_step(statement) == SQLITE_ROW) {
@@ -475,11 +477,10 @@ static DataManager *defaultDataManager = nil;
 - (void)insertAnswer:(Answer *)answer forQuestion:(Question *)question forQuizId:(NSNumber *)quizId {
     NSInteger answerForQuestionId = [self insertAnsweredQuestion:question forQuizId:quizId];
     
-    NSString* queryStr;
-//    UserChoices *userChoices = [self.quizToUserChoices objectForKey:quizId];
     
     BOOL isQuestionAnswered = [self isRowId:answerForQuestionId forColumn:@"AnswerForQuestionId" inTable:@"AnswerForQuestion"];
     
+    NSString* queryStr;    
     queryStr = [NSString stringWithFormat:@"INSERT INTO AnswerForQuestion(AnswerForQuestionId, AnswerId)  VALUES (\"%d\", \"%d\")",
                 answerForQuestionId, answer.answerId];
     if(isQuestionAnswered){
