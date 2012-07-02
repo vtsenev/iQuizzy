@@ -1,6 +1,8 @@
 to-do
 
 - adding a multiple choice question doesn't work properly... forgets answers of subquestions
+ - when a subquestion of multiple question is answered and after that chose a new answer without uncheck an old one, then the answer of subquestion disappears
+- when we chose new items from the multiple question the old one is not cleared from the DB 
 
 for documentation purposes:
 

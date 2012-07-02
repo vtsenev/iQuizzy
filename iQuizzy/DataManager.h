@@ -38,8 +38,13 @@
 - (void)insertQuiz:(Quiz *)quiz;
 - (NSInteger)insertAnswer:(Answer *)answer;
 - (void)insertAnswer:(Answer *)answer forQuestion:(Question *)question forQuizId:(NSNumber *)quizId;
+- (NSInteger)insertAnsweredQuestion:(Question *)question forQuizId:(NSNumber *)quizId;
 
 - (void)deleteQuizWithId:(NSNumber *)quizId;
+- (void)deleteRowId:(NSInteger)rowId forColumn:(NSString *)column fromTable:(NSString *)table;
+
+- (BOOL) isRowId:(NSInteger)rowId forColumn:(NSString *)column inTable:(NSString *)table;
+- (BOOL) isQuestionId:(NSInteger)questionId andQuizId:(NSInteger)quizId;
 
 - (void)closeDB;
 

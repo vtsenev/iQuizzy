@@ -48,12 +48,13 @@
     [super viewDidLoad];
     
     self.tableData = [[DataManager defaultDataManager] fetchSections];
-    [self initializeQuestionsAndAnswers];
+
     [self.navigationItem setTitle:self.quiz.title];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [self initializeQuestionsAndAnswers];
     [self.tableView reloadData];
 }
 
@@ -181,8 +182,12 @@
 #pragma mark - QuestionDelegate Methods
 
 - (void) didSubmitQuestions:(NSArray *)questions withAnswers:(NSDictionary *)answers forSection:(NSString *)section {
-    [self.openQuestions setValue:questions forKey:section];
-    [self.answersForSection setValue:answers forKey:section];
+//    [self.openQuestions setValue:questions forKey:section];
+//    [self.answersForSection setValue:answers forKey:section];
+    
+    NSLog(@"Answers %@", answers);
+    NSLog(@"AnswersForSection %@", self.answersForSection);
+    
 }
 
 @end

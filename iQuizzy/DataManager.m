@@ -24,6 +24,7 @@ static DataManager *defaultDataManager = nil;
 - (void)fetchQuestionParents;
 - (NSInteger)getQuestionLevel:(NSInteger)questionId;
 
+
 @end
 
 @implementation DataManager
@@ -71,7 +72,7 @@ static DataManager *defaultDataManager = nil;
     NSString *path = [self createEditableDatabase];
     
     if (sqlite3_open([path UTF8String], &database) == SQLITE_OK) {
-        NSLog(@"Opening database");
+        NSLog(@"Opening database at path: %@", path);
     } else {
         sqlite3_close(database);
         NSAssert1(0, @"Failed to open database: %s'.", sqlite3_errmsg(database));
@@ -176,26 +177,26 @@ static DataManager *defaultDataManager = nil;
 
 - (NSArray *)fetchSubquestionsOfQuestion:(Question *)question forAnswer:(Answer *)answer {
     NSMutableArray *result = [[NSMutableArray alloc] init];
-
+    
     sqlite3_stmt *statement;
     const char *sqlRequest = "SELECT q.QuestionText, q.QuestionType, s.SectionText, q.QuestionId FROM Question q join Section s on q.QuestionSectionId = s.sectionId join QuestionParent qp on qp.ParentId = q.QuestionParentId where (qp.QuestionId = ?) and (qp.AnswerId = ?)";
     
     int sqlResult = sqlite3_prepare_v2(database, sqlRequest, -1, &statement, NULL);
-
+    
     if(sqlResult == SQLITE_OK) {
         sqlite3_bind_int(statement,1,question.questionId);
         sqlite3_bind_int(statement,2,answer.answerId);
         
         while (sqlite3_step(statement) == SQLITE_ROW) {
             Question *question = [[Question alloc] init];
-
+            
             char *questionText = (char *)sqlite3_column_text(statement, 0);
             question.questionText = (questionText) ? [NSString stringWithUTF8String:questionText] : @"";
             question.questionType = sqlite3_column_int(statement, 1);
             char *questionSection = (char *)sqlite3_column_text(statement, 2);
             question.questionSection = (questionSection) ? [NSString stringWithUTF8String:questionSection] : @"";
             question.questionId = sqlite3_column_int(statement, 3);
-
+            
             [result addObject:question];
         }
         sqlite3_finalize(statement);
@@ -316,6 +317,8 @@ static DataManager *defaultDataManager = nil;
     return allQuizes;
 }
 
+
+
 - (void)fetchUserResponsesForQuizWithId:(NSNumber *)quizId {
     UserChoices *userChoices = [self.quizToUserChoices objectForKey:quizId];
     if (!userChoices) {
@@ -344,7 +347,7 @@ static DataManager *defaultDataManager = nil;
             question.questionId =  sqlite3_column_int(statement, 4);
             char *sectionText = (char *)sqlite3_column_text(statement, 5);
             question.questionSection = [NSString stringWithUTF8String:sectionText];
-
+            
             NSNumber *questionId = [NSNumber numberWithInt:question.questionId];
             if(question.questionType == 0 || question.questionType == 2) {
                 [userChoices addAnswer:answer toSingleChoiceQuestion:questionId];
@@ -371,6 +374,7 @@ static DataManager *defaultDataManager = nil;
     
 }
 
+
 # pragma mark - Insert data into database
 
 - (void)insertQuiz:(Quiz *)quiz {
@@ -383,7 +387,7 @@ static DataManager *defaultDataManager = nil;
     
     if (sqlResult == SQLITE_OK) {
         if (sqlite3_step(statement) == SQLITE_DONE) {
-            NSLog(@"Quiz added");
+            NSLog(@"Quiz %@ added", quiz.title);
             quizId = sqlite3_last_insert_rowid(database);
             quiz.quizId = [NSNumber numberWithInt:quizId];
         } else {
@@ -408,7 +412,7 @@ static DataManager *defaultDataManager = nil;
     
     if (sqlResult == SQLITE_OK) {
         if (sqlite3_step(statement) == SQLITE_DONE) {
-            NSLog(@"Answer added");
+            NSLog(@"Answer %@ added", answer.answerText);
             answerId = sqlite3_last_insert_rowid(database);
         } else {
             NSLog(@"Failed to add answer");
@@ -424,41 +428,81 @@ static DataManager *defaultDataManager = nil;
 
 - (NSInteger)insertAnsweredQuestion:(Question *)question forQuizId:(NSNumber *)quizId {
     sqlite3_stmt *statement;
-    NSString *insertSQL = [NSString stringWithFormat:@"INSERT INTO QuizQuestionsWithAnswers(QuestionId, QuizId)  VALUES (\"%d\", \"%@\")", question.questionId, quizId];
-    const char *insert_stmt = [insertSQL UTF8String];
-    int sqlResult = sqlite3_prepare_v2(database, insert_stmt, -1, &statement, NULL);
-    
+//    UserChoices *userChoices = [self.quizToUserChoices objectForKey:quizId];
     NSInteger answeredQuestionId = -1;
-    
+    NSString* queryStr;
+//    BOOL isQuestionAnswered = [userChoices isQuestionAnswered:[NSNumber numberWithInt:question.questionId]];
+    BOOL isQuestionAnswered = [self isQuestionId:question.questionId andQuizId:[quizId intValue]];
+    if(!isQuestionAnswered )
+    {
+        queryStr = [NSString stringWithFormat:@"INSERT INTO QuizQuestionsWithAnswers(QuestionId, QuizId)  VALUES (\"%d\", \"%@\")", question.questionId, quizId];
+        
+    }
+    else{
+        queryStr = [NSString stringWithFormat:@"SELECT AnswerForQuestionId FROM QuizQuestionsWithAnswers WHERE (QuestionId = %d) AND (QuizId = %@)", question.questionId, quizId];
+    }
+    const char *query_stmt = [queryStr UTF8String];
+    int sqlResult = sqlite3_prepare_v2(database, query_stmt, -1, &statement, NULL);
     if (sqlResult == SQLITE_OK) {
-        if (sqlite3_step(statement) == SQLITE_DONE) {
-            NSLog(@"Answered Question added");
-            answeredQuestionId = sqlite3_last_insert_rowid(database);
-        } else {
-            NSLog(@"Failed to add Answered Question");
+        if(!isQuestionAnswered){
+            if (sqlite3_step(statement) == SQLITE_DONE) {
+                NSLog(@"Answered Question %@ added", question.questionText);
+                answeredQuestionId = sqlite3_last_insert_rowid(database);
+            }
+            else {
+                NSLog(@"Problem with the database:");
+                NSLog(@"%d", sqlResult);
+            }
+            
         }
-    } else {
-        NSLog(@"Problem with the database:");
-        NSLog(@"%d", sqlResult);
+        else {
+            while (sqlite3_step(statement) == SQLITE_ROW) {
+                answeredQuestionId = sqlite3_column_int(statement, 0);
+                NSLog(@"Answered Question %@ selected", question.questionText); 
+            }
+        }
+    } 
+    else {
+        NSLog(@"Failed to add or select Answered Question");
     }
     sqlite3_finalize(statement);
     
     return answeredQuestionId;
 }
 
+
+
 - (void)insertAnswer:(Answer *)answer forQuestion:(Question *)question forQuizId:(NSNumber *)quizId {
     NSInteger answerForQuestionId = [self insertAnsweredQuestion:question forQuizId:quizId];
     
+    NSString* queryStr;
+//    UserChoices *userChoices = [self.quizToUserChoices objectForKey:quizId];
+    
+    BOOL isQuestionAnswered = [self isRowId:answerForQuestionId forColumn:@"AnswerForQuestionId" inTable:@"AnswerForQuestion"];
+    
+    queryStr = [NSString stringWithFormat:@"INSERT INTO AnswerForQuestion(AnswerForQuestionId, AnswerId)  VALUES (\"%d\", \"%d\")",
+                answerForQuestionId, answer.answerId];
+    if(isQuestionAnswered){
+        if(question.questionType == 0){ 
+            queryStr = [NSString stringWithFormat:@"UPDATE AnswerForQuestion SET AnswerId = %d WHERE AnswerForQuestionId = %d",
+                        answer.answerId, answerForQuestionId];
+        }
+    }
+    
     sqlite3_stmt *statement;
-    NSString *insertSQL = [NSString stringWithFormat:@"INSERT INTO AnswerForQuestion(AnswerForQuestionId, AnswerId)  VALUES (\"%d\", \"%d\")", answerForQuestionId, answer.answerId];
-    const char *insert_stmt = [insertSQL UTF8String];
-    int sqlResult = sqlite3_prepare_v2(database, insert_stmt, -1, &statement, NULL);
+    const char *query_stmt = [queryStr UTF8String];
+    int sqlResult = sqlite3_prepare_v2(database, query_stmt, -1, &statement, NULL);
     
     if (sqlResult == SQLITE_OK) {
         if (sqlite3_step(statement) == SQLITE_DONE) {
-            NSLog(@"Answer for Question added");
+            if(!isQuestionAnswered){
+                NSLog(@"Answer %@ for Question %@ added ", answer.answerText, question.questionText);
+            }
+            else {
+                NSLog(@"Answer %@ for Question %@ updated ", answer.answerText, question.questionText);
+            }
         } else {
-            NSLog(@"Failed to add Answer for Question");
+            NSLog(@"Failed to add or updated Answer %@ for Question %@", answer.answerText, question.questionText);
         }
     } else {
         NSLog(@"Problem with the database:");
@@ -480,6 +524,26 @@ static DataManager *defaultDataManager = nil;
             NSLog(@"Quiz deleted");
         } else {
             NSLog(@"Failed to delete");
+        }
+    } else {
+        NSLog(@"Problem with the database:");
+        NSLog(@"%d", sqlResult);
+    }
+    sqlite3_finalize(statement);
+}
+
+
+- (void)deleteRowId:(NSInteger)rowId forColumn:(NSString *)column fromTable:(NSString *)table{
+    
+    sqlite3_stmt *statement;
+    NSString *deleteQuery = [NSString stringWithFormat:@"DELETE FROM %@ WHERE %@ = %d",table,column, rowId];
+    const char *delete_stmt = [deleteQuery UTF8String];
+    int sqlResult = sqlite3_prepare_v2(database, delete_stmt, -1, &statement, NULL);
+    if (sqlResult == SQLITE_OK) {
+        if (sqlite3_step(statement) == SQLITE_DONE) {
+            NSLog(@"rows with Id %d deleted", rowId );
+        } else {
+            NSLog(@"Failed to delete rows with Id: %d", rowId);
         }
     } else {
         NSLog(@"Problem with the database:");
@@ -532,7 +596,7 @@ static DataManager *defaultDataManager = nil;
 - (NSDictionary *)createQuestionTree {
     self.questionIdsToQuestions = [self fetchAllQuestions];
     [self fetchQuestionParents];
-
+    
     NSArray *allQuestions = [self.questionIdsToQuestions allValues];
     for (Question *q in allQuestions) {
         if (q.questionParentId == 0) {
@@ -555,5 +619,52 @@ static DataManager *defaultDataManager = nil;
         return [self getQuestionLevel:parent.questionParentId] + 1;
     }
 }
+
+#pragma mark - predicates for DB
+- (BOOL) isRowId:(NSInteger)rowId forColumn:(NSString *)column inTable:(NSString *)table{
+    NSString *isExistRowIdQuery = [NSString stringWithFormat:@"SELECT count(*) FROM %@ WHERE %@ = %d  ", table, column, rowId];
+    const char *isExistRowIdStmt = [isExistRowIdQuery UTF8String];
+
+    
+    sqlite3_stmt *statement;
+    int sqlResult = sqlite3_prepare_v2(database, isExistRowIdStmt, -1, &statement, NULL);
+    
+    NSInteger rowCount = -1;
+    if (sqlResult == SQLITE_OK) {
+        while (sqlite3_step(statement) == SQLITE_ROW) {
+            rowCount = sqlite3_column_int(statement, 0);
+        }
+        sqlite3_finalize(statement);
+    } else {
+        NSLog(@"Problem with the database:");
+        NSLog(@"%d", sqlResult);
+    }
+    return rowCount > 0;
+}
+
+- (BOOL) isQuestionId:(NSInteger)questionId andQuizId:(NSInteger)quizId {
+    NSString *isExistRowIdQuery =
+        [NSString stringWithFormat:@"SELECT count(*) FROM QuizQuestionsWithAnswers WHERE QuestionId = %d and QuizId = %d", questionId, quizId];
+    
+    const char *isExistRowIdStmt = [isExistRowIdQuery UTF8String];
+    
+    
+    sqlite3_stmt *statement;
+    int sqlResult = sqlite3_prepare_v2(database, isExistRowIdStmt, -1, &statement, NULL);
+    
+    NSInteger rowCount = -1;
+    if (sqlResult == SQLITE_OK) {
+        while (sqlite3_step(statement) == SQLITE_ROW) {
+            rowCount = sqlite3_column_int(statement, 0);
+        }
+        sqlite3_finalize(statement);
+    } else {
+        NSLog(@"Problem with the database:");
+        NSLog(@"%d", sqlResult);
+    }
+    return rowCount > 0;
+}
+
+
 
 @end

@@ -164,6 +164,8 @@
         Question *q = [self.questionsWithIds objectForKey:questionId];
         NSString *currentSection = q.questionSection;
         NSMutableDictionary *answersForCurrentSection = [answersForSections valueForKey:currentSection];
+        
+        NSLog(@"fetchAnswersToQuestion - Question: %@ Answer: %@",q.questionText, answerText);
         [answersForCurrentSection setValue:answerText forKey:q.questionText];
     }
     

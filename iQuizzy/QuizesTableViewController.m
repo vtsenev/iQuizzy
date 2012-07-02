@@ -72,7 +72,7 @@
         Quiz *quiz = [self.tableData objectAtIndex:[indexPath row]];
         [[DataManager defaultDataManager] deleteQuizWithId:quiz.quizId];
         [self.tableData removeObjectAtIndex:[indexPath row]];
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
     }
 }
 
