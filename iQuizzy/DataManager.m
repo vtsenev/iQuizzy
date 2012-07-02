@@ -324,7 +324,10 @@ static DataManager *defaultDataManager = nil;
     if (!userChoices) {
         userChoices = [[UserChoices alloc] init];
         [self.quizToUserChoices setObject:userChoices forKey:quizId];
+    } else {
+        return;
     }
+    
     NSMutableDictionary *multipleChoiceQuestionIdToAnswers = [[NSMutableDictionary alloc] init];
     
     NSString *sqlReqStr = [NSString stringWithFormat:@"SELECT AnswerId, Answer, QuestionText, QuestionType, QuestionId, SectionText from AnswersForQuestionsView where QuizId = %@", quizId];
@@ -621,10 +624,10 @@ static DataManager *defaultDataManager = nil;
 }
 
 #pragma mark - predicates for DB
-- (BOOL) isRowId:(NSInteger)rowId forColumn:(NSString *)column inTable:(NSString *)table{
+
+- (BOOL)isRowId:(NSInteger)rowId forColumn:(NSString *)column inTable:(NSString *)table{
     NSString *isExistRowIdQuery = [NSString stringWithFormat:@"SELECT count(*) FROM %@ WHERE %@ = %d  ", table, column, rowId];
     const char *isExistRowIdStmt = [isExistRowIdQuery UTF8String];
-
     
     sqlite3_stmt *statement;
     int sqlResult = sqlite3_prepare_v2(database, isExistRowIdStmt, -1, &statement, NULL);
@@ -645,13 +648,10 @@ static DataManager *defaultDataManager = nil;
 - (BOOL) isQuestionId:(NSInteger)questionId andQuizId:(NSInteger)quizId {
     NSString *isExistRowIdQuery =
         [NSString stringWithFormat:@"SELECT count(*) FROM QuizQuestionsWithAnswers WHERE QuestionId = %d and QuizId = %d", questionId, quizId];
-    
     const char *isExistRowIdStmt = [isExistRowIdQuery UTF8String];
-    
     
     sqlite3_stmt *statement;
     int sqlResult = sqlite3_prepare_v2(database, isExistRowIdStmt, -1, &statement, NULL);
-    
     NSInteger rowCount = -1;
     if (sqlResult == SQLITE_OK) {
         while (sqlite3_step(statement) == SQLITE_ROW) {
@@ -664,7 +664,5 @@ static DataManager *defaultDataManager = nil;
     }
     return rowCount > 0;
 }
-
-
 
 @end

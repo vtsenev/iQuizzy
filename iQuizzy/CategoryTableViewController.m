@@ -17,6 +17,7 @@
 @property (nonatomic, strong) NSArray *tableData;
 @property (nonatomic, strong) NSMutableDictionary *openQuestions;
 @property (nonatomic, strong) NSMutableDictionary *answersForSection;
+@property (nonatomic) BOOL viewWillGoToRoot;
 
 - (IBAction)sendEmail;
 - (void)initializeQuestionsAndAnswers;
@@ -29,6 +30,7 @@
 @synthesize openQuestions;
 @synthesize answersForSection;
 @synthesize quiz;
+@synthesize viewWillGoToRoot;
 
 - (void)viewDidUnload {
     [super viewDidUnload];
@@ -46,16 +48,28 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     self.tableData = [[DataManager defaultDataManager] fetchSections];
-
     [self.navigationItem setTitle:self.quiz.title];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self initializeQuestionsAndAnswers];
+    self.viewWillGoToRoot = YES;
     [self.tableView reloadData];
+    
+    
+    UserChoices *userChoices = [[[DataManager defaultDataManager] quizToUserChoices] objectForKey:self.quiz.quizId];
+    NSLog(@"%@", userChoices.questionAndAnswers);
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    if (self.viewWillGoToRoot) {
+        UserChoices *userChoices = [[[DataManager defaultDataManager] quizToUserChoices] objectForKey:self.quiz.quizId];
+        [[[DataManager defaultDataManager] quizToUserChoices] setObject:userChoices forKey:self.quiz.quizId];
+        NSLog(@"%@", userChoices.questionAndAnswers);
+    }
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -73,7 +87,7 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return @"Question categories";
+    return @"Question sections";
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -97,6 +111,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self performSegueWithIdentifier:@"categoryQuestions" sender:indexPath];
+    self.viewWillGoToRoot = NO;
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -111,6 +126,8 @@
         if (questions) {
             questionsTableViewController.tableData = [NSMutableArray arrayWithArray:questions];
             questionsTableViewController.answers = [self.answersForSection valueForKey:section];
+            
+            NSLog(@"Answers %@", [self.answersForSection valueForKey:section]);
         }
     }
 }
@@ -142,6 +159,7 @@
 # pragma mark - private methods
 
 - (IBAction)sendEmail {
+    self.viewWillGoToRoot = NO;
     if ([MFMailComposeViewController canSendMail]) {
         MFMailComposeViewController *mailer = [[MFMailComposeViewController alloc] init];
         mailer.mailComposeDelegate = self;
@@ -182,12 +200,8 @@
 #pragma mark - QuestionDelegate Methods
 
 - (void) didSubmitQuestions:(NSArray *)questions withAnswers:(NSDictionary *)answers forSection:(NSString *)section {
-//    [self.openQuestions setValue:questions forKey:section];
-//    [self.answersForSection setValue:answers forKey:section];
-    
-    NSLog(@"Answers %@", answers);
-    NSLog(@"AnswersForSection %@", self.answersForSection);
-    
+    [self.openQuestions setValue:questions forKey:section];
+    [self.answersForSection setValue:answers forKey:section];
 }
 
 @end
