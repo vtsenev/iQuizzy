@@ -138,7 +138,7 @@
 
 - (void)selectOldAnswers {
     UserChoices *userChoices = [[[DataManager defaultDataManager] quizToUserChoices] objectForKey:self.quiz.quizId];
-    NSNumber *questionId = [NSNumber numberWithInt:self.question.questionId];
+    NSNumber *questionId = self.question.questionId;
     BOOL isQuestionAnswered = [userChoices isQuestionAnswered:questionId];
     
     if (isQuestionAnswered) {
