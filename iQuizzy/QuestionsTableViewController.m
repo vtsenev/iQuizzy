@@ -176,8 +176,6 @@
         [self removeAllSubquestionsOfQuestion:question];
     }
     
-//    [[DataManager defaultDataManager] addAnswers:answerObject forQuestion:[NSNumber numberWithInt:question.questionId] forQuizId:self.quiz.quizId];
-    
     if (question.questionType == 0) {
         Answer *answer = (Answer *)answerObject;
         [self.answers setValue:answer.answerText forKey:question.questionText];

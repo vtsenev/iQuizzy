@@ -411,6 +411,7 @@ static DataManager *defaultDataManager = nil;
 
 - (NSInteger)insertAnswer:(Answer *)answer {
     sqlite3_stmt *statement;
+    
     NSString *insertSQL = [NSString stringWithFormat:@"INSERT INTO Answer(Answer)  VALUES (\"%@\")", answer.answerText];
     const char *insert_stmt = [insertSQL UTF8String];
     int sqlResult = sqlite3_prepare_v2(database, insert_stmt, -1, &statement, NULL);
@@ -437,7 +438,7 @@ static DataManager *defaultDataManager = nil;
     sqlite3_stmt *statement;
     NSInteger answeredQuestionId = -1;
     NSString* queryStr;
-    BOOL isQuestionAnswered = [self isQuestionId:question.questionId andQuizId:[quizId intValue]];
+    BOOL isQuestionAnswered = [self isExistQuestionId:question.questionId andQuizId:[quizId intValue]];
     
     if(!isQuestionAnswered )
     {
@@ -480,16 +481,19 @@ static DataManager *defaultDataManager = nil;
 - (void)insertAnswer:(Answer *)answer forQuestion:(Question *)question forQuizId:(NSNumber *)quizId {
     NSInteger answerForQuestionId = [self insertAnsweredQuestion:question forQuizId:quizId];
     
-    
-    BOOL isQuestionAnswered = [self isRowId:answerForQuestionId forColumn:@"AnswerForQuestionId" inTable:@"AnswerForQuestion"];
-    
     NSString* queryStr;    
     queryStr = [NSString stringWithFormat:@"INSERT INTO AnswerForQuestion(AnswerForQuestionId, AnswerId)  VALUES (\"%d\", \"%d\")",
                 answerForQuestionId, answer.answerId];
+    
+    BOOL isQuestionAnswered = [self isExistRowId:answerForQuestionId forColumn:@"AnswerForQuestionId" InTable:@"AnswerForQuestion"];
+    
     if(isQuestionAnswered){
         if(question.questionType == 0){ 
             queryStr = [NSString stringWithFormat:@"UPDATE AnswerForQuestion SET AnswerId = %d WHERE AnswerForQuestionId = %d",
                         answer.answerId, answerForQuestionId];
+        }
+        else if(question.questionType == 2){
+                
         }
     }
     
@@ -514,6 +518,7 @@ static DataManager *defaultDataManager = nil;
     }
     sqlite3_finalize(statement);
 }
+
 
 # pragma mark - Delete data from database
 
@@ -626,7 +631,7 @@ static DataManager *defaultDataManager = nil;
 
 #pragma mark - predicates for DB
 
-- (BOOL)isRowId:(NSInteger)rowId forColumn:(NSString *)column inTable:(NSString *)table{
+- (BOOL)isExistRowId:(NSInteger)rowId forColumn:(NSString *)column InTable:(NSString *)table{
     NSString *isExistRowIdQuery = [NSString stringWithFormat:@"SELECT count(*) FROM %@ WHERE %@ = %d  ", table, column, rowId];
     const char *isExistRowIdStmt = [isExistRowIdQuery UTF8String];
     
@@ -646,7 +651,7 @@ static DataManager *defaultDataManager = nil;
     return rowCount > 0;
 }
 
-- (BOOL) isQuestionId:(NSInteger)questionId andQuizId:(NSInteger)quizId {
+- (BOOL) isExistQuestionId:(NSInteger)questionId andQuizId:(NSInteger)quizId {
     NSString *isExistRowIdQuery =
         [NSString stringWithFormat:@"SELECT count(*) FROM QuizQuestionsWithAnswers WHERE QuestionId = %d and QuizId = %d", questionId, quizId];
     const char *isExistRowIdStmt = [isExistRowIdQuery UTF8String];
