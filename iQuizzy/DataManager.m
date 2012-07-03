@@ -134,10 +134,10 @@ static DataManager *defaultDataManager = nil;
             question.questionType = sqlite3_column_int(statement, 1);
             char *questionSection = (char *)sqlite3_column_text(statement, 2);
             question.questionSection = (questionSection) ? [NSString stringWithUTF8String:questionSection] : @"";
-            question.questionId = sqlite3_column_int(statement, 3);
+            NSInteger questionId = sqlite3_column_int(statement, 3);
+            question.questionId = [NSNumber numberWithInt:questionId];
             
-            NSNumber *questionId = [NSNumber numberWithInt:question.questionId];
-            [result setObject:question forKey:questionId];
+            [result setObject:question forKey:question.questionId];
         }
         sqlite3_finalize(statement);
     } else {
@@ -162,7 +162,8 @@ static DataManager *defaultDataManager = nil;
             question.questionType = sqlite3_column_int(statement, 1);
             char *questionSection = (char *)sqlite3_column_text(statement, 2);
             question.questionSection = (questionSection) ? [NSString stringWithUTF8String:questionSection] : @"";
-            question.questionId = sqlite3_column_int(statement, 3);
+            NSInteger questionId = sqlite3_column_int(statement, 3);
+            question.questionId = [NSNumber numberWithInt:questionId];
             
             [result addObject:question];
         }
@@ -184,8 +185,8 @@ static DataManager *defaultDataManager = nil;
     int sqlResult = sqlite3_prepare_v2(database, sqlRequest, -1, &statement, NULL);
     
     if(sqlResult == SQLITE_OK) {
-        sqlite3_bind_int(statement,1,question.questionId);
-        sqlite3_bind_int(statement,2,answer.answerId);
+        sqlite3_bind_int(statement, 1, [question.questionId intValue]);
+        sqlite3_bind_int(statement, 2, answer.answerId);
         
         while (sqlite3_step(statement) == SQLITE_ROW) {
             Question *question = [[Question alloc] init];
@@ -195,7 +196,8 @@ static DataManager *defaultDataManager = nil;
             question.questionType = sqlite3_column_int(statement, 1);
             char *questionSection = (char *)sqlite3_column_text(statement, 2);
             question.questionSection = (questionSection) ? [NSString stringWithUTF8String:questionSection] : @"";
-            question.questionId = sqlite3_column_int(statement, 3);
+            NSInteger questionId = sqlite3_column_int(statement, 3);
+            question.questionId = [NSNumber numberWithInt:questionId];
             
             [result addObject:question];
         }
@@ -227,7 +229,7 @@ static DataManager *defaultDataManager = nil;
     int sqlResult = sqlite3_prepare_v2(database, sqlRequest, -1, &statement, NULL);
     
     if(sqlResult == SQLITE_OK) {
-        sqlite3_bind_int(statement, 1, question.questionId);
+        sqlite3_bind_int(statement, 1, [question.questionId intValue]);
         while (sqlite3_step(statement) == SQLITE_ROW) {
             Answer *answer = [[Answer alloc] init];
             
@@ -347,19 +349,19 @@ static DataManager *defaultDataManager = nil;
             char *questionText = (char *)sqlite3_column_text(statement, 2);
             question.questionText = [NSString stringWithUTF8String:questionText];
             question.questionType =  sqlite3_column_int(statement, 3);
-            question.questionId =  sqlite3_column_int(statement, 4);
+            NSInteger questionId =  sqlite3_column_int(statement, 4);
+            question.questionId = [NSNumber numberWithInt:questionId];
             char *sectionText = (char *)sqlite3_column_text(statement, 5);
             question.questionSection = [NSString stringWithUTF8String:sectionText];
             
-            NSNumber *questionId = [NSNumber numberWithInt:question.questionId];
             if(question.questionType == 0 || question.questionType == 2) {
-                [userChoices addAnswer:answer toSingleChoiceQuestion:questionId];
+                [userChoices addAnswer:answer toSingleChoiceQuestion:question.questionId];
             } else if (question.questionType == 1) {
-                NSMutableArray *answersForQuestion = [multipleChoiceQuestionIdToAnswers objectForKey:questionId];
+                NSMutableArray *answersForQuestion = [multipleChoiceQuestionIdToAnswers objectForKey:question.questionId];
                 if (answersForQuestion) {
                     [answersForQuestion addObject:answer];
                 } else {
-                    [multipleChoiceQuestionIdToAnswers setObject:[[NSMutableArray alloc] initWithObjects:answer, nil] forKey:questionId];
+                    [multipleChoiceQuestionIdToAnswers setObject:[[NSMutableArray alloc] initWithObjects:answer, nil] forKey:question.questionId];
                 }
             }
         }
@@ -434,15 +436,15 @@ static DataManager *defaultDataManager = nil;
 //    UserChoices *userChoices = [self.quizToUserChoices objectForKey:quizId];
     NSInteger answeredQuestionId = -1;
     NSString* queryStr;
-//    BOOL isQuestionAnswered = [userChoices isQuestionAnswered:[NSNumber numberWithInt:question.questionId]];
-    BOOL isQuestionAnswered = [self isQuestionId:question.questionId andQuizId:[quizId intValue]];
+    BOOL isQuestionAnswered = [self isQuestionId:[question.questionId intValue] andQuizId:[quizId intValue]];
     if(!isQuestionAnswered )
     {
-        queryStr = [NSString stringWithFormat:@"INSERT INTO QuizQuestionsWithAnswers(QuestionId, QuizId)  VALUES (\"%d\", \"%@\")", question.questionId, quizId];
+        queryStr = [NSString stringWithFormat:@"INSERT INTO QuizQuestionsWithAnswers(QuestionId, QuizId)  VALUES (\"%d\", \"%@\")", [question.questionId intValue], quizId];
         
     }
     else{
-        queryStr = [NSString stringWithFormat:@"SELECT AnswerForQuestionId FROM QuizQuestionsWithAnswers WHERE (QuestionId = %d) AND (QuizId = %@)", question.questionId, quizId];
+        queryStr = [NSString stringWithFormat:@"SELECT AnswerForQuestionId FROM QuizQuestionsWithAnswers WHERE (QuestionId = %d) AND (QuizId = %@)",
+                    [question.questionId intValue], quizId];
     }
     const char *query_stmt = [queryStr UTF8String];
     int sqlResult = sqlite3_prepare_v2(database, query_stmt, -1, &statement, NULL);
@@ -555,9 +557,9 @@ static DataManager *defaultDataManager = nil;
     sqlite3_finalize(statement);
 }
 
-# pragma mark - Add user response and sort responses
+# pragma mark - Add user responses and categorize responses according to sections
 
-- (NSArray *)categorizeQuestions:(NSArray *)questions{
+- (NSArray *)categorizeQuestions:(NSArray *)questions {
     NSMutableArray *categorizedQuestions = [[NSMutableArray alloc]init];
     NSArray *sections = [self fetchSections];
     

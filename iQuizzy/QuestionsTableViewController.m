@@ -76,7 +76,7 @@
     [super viewWillAppear:animated];
     self.willGoBackToRootView = YES;
     for (Question *questionInTable in self.tableData) {
-        Question *question = [questionDict objectForKey:[NSNumber numberWithInt:questionInTable.questionId]];
+        Question *question = [questionDict objectForKey:questionInTable.questionId];
         questionInTable.questionParentId = question.questionParentId;
     }
     
@@ -115,7 +115,7 @@
     [cell.textLabel setText:question.questionText];
     
     UserChoices *userChoices = [[[DataManager defaultDataManager] quizToUserChoices] objectForKey:self.quiz.quizId];
-    if ([userChoices isQuestionAnswered:[NSNumber numberWithInt:question.questionId]]) {
+    if ([userChoices isQuestionAnswered:question.questionId]) {
         cell.detailTextLabel.text = [self.answers valueForKey:question.questionText];
     } else {
         cell.detailTextLabel.text = @"";
@@ -176,19 +176,17 @@
         [self removeAllSubquestionsOfQuestion:question];
     }
     
-//    [[DataManager defaultDataManager] addAnswers:answerObject forQuestion:[NSNumber numberWithInt:question.questionId] forQuizId:self.quiz.quizId];
-    
     if (question.questionType == 0) {
         Answer *answer = (Answer *)answerObject;
         [self.answers setValue:answer.answerText forKey:question.questionText];
         [[DataManager defaultDataManager] insertAnswer:answer forQuestion:question forQuizId:self.quiz.quizId];
-        [[DataManager defaultDataManager] addAnswers:answerObject forQuestion:[NSNumber numberWithInt:question.questionId] forQuizId:self.quiz.quizId];
+        [[DataManager defaultDataManager] addAnswers:answerObject forQuestion:question.questionId forQuizId:self.quiz.quizId];
         
     } else if (question.questionType == 1) {
         
         NSInteger answerForQuestionId = [[DataManager defaultDataManager] insertAnsweredQuestion:question forQuizId:self.quiz.quizId];
         [[DataManager defaultDataManager] deleteRowId:answerForQuestionId forColumn:@"AnswerForQuestionId" fromTable:@"AnswerForQuestion"];
-        [[DataManager defaultDataManager] addAnswers:answerObject forQuestion:[NSNumber numberWithInt:question.questionId] forQuizId:self.quiz.quizId];
+        [[DataManager defaultDataManager] addAnswers:answerObject forQuestion:question.questionId forQuizId:self.quiz.quizId];
         
         NSArray *theAnswers = (NSArray *)answerObject;
         NSString *concatenatedAnswers = [theAnswers componentsJoinedByString: @", "];
@@ -210,7 +208,7 @@
 }
 
 - (void)didSubmitTextAnswer:(Answer *)textAnswer forQuestion:(Question *)question {
-    [[DataManager defaultDataManager] addAnswers:textAnswer forQuestion:[NSNumber numberWithInt:question.questionId] forQuizId:self.quiz.quizId];
+    [[DataManager defaultDataManager] addAnswers:textAnswer forQuestion:question.questionId forQuizId:self.quiz.quizId];
     [self.answers setValue:textAnswer.answerText forKey:question.questionText];
     
     [self.tableView reloadData];
@@ -232,13 +230,14 @@
             [self.tableData removeObjectIdenticalTo:q];
         }
         
-        NSNumber *questionId = [NSNumber numberWithInt:q.questionId];
+        NSNumber *questionId = q.questionId;
         if (![visited containsObject:questionId]) {
             [visited addObject:questionId];
             
             NSArray *children = [self getSubquestionsOfQuestion:q];
             for (Question *child in children) {
-                if (![visited containsObject:[NSNumber numberWithInt:child.questionId]]) {
+                NSNumber *childId = child.questionId;
+                if (![visited containsObject:childId]) {
                     [stack addObject:child];
                 }
             }
@@ -249,7 +248,7 @@
 - (NSArray *)getSubquestionsOfQuestion:(Question *)question {
     NSMutableArray *result = [[NSMutableArray alloc] init];
     for (Question *q in self.tableData) {
-        if (q.questionParentId == question.questionId) {
+        if (q.questionParentId == [question.questionId intValue]) {
             [result addObject:q];
         }
     }

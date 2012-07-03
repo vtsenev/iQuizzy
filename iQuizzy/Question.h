@@ -10,7 +10,8 @@
 
 @interface Question : NSObject
 
-@property (nonatomic) NSInteger questionId;
+//@property (nonatomic) NSInteger questionId;
+@property (nonatomic, strong) NSNumber *questionId;
 @property (nonatomic, strong) NSString *questionText;
 @property (nonatomic, strong) NSString *questionSection;
 @property (nonatomic) NSInteger questionType;

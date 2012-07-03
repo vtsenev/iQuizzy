@@ -188,14 +188,14 @@
         
         [openSubquestions addObject:q];
         
-        NSNumber *questionId = [NSNumber numberWithInt:q.questionId];
+        NSNumber *questionId = q.questionId;
         if (![visited containsObject:questionId]) {
             [visited addObject:questionId];
             if ([self isQuestionAnswered:questionId]) {
                 NSObject *answer = [self getAnswerOfQuestionWithId:questionId];
                 NSArray *children = [self getSubquestionsOfQuestionWithId:questionId andAnswer:answer];
                 for (Question *subquestion in children) {
-                    NSNumber *subquestionId = [NSNumber numberWithInt:subquestion.questionId];
+                    NSNumber *subquestionId = subquestion.questionId;
                     if (![visited containsObject:subquestionId]) {
                         [stack addObject:subquestion];
                     }
@@ -217,7 +217,7 @@
         Question *q = [stack lastObject];
         [stack removeLastObject];
         
-        NSNumber *questionId = [NSNumber numberWithInt:q.questionId];
+        NSNumber *questionId = q.questionId;
         if (![self isQuestionAnswered:questionId]) {
             return NO;
         }
@@ -227,7 +227,7 @@
             NSObject *answer = [self getAnswerOfQuestionWithId:questionId];
             NSArray *children = [self getSubquestionsOfQuestionWithId:questionId andAnswer:answer];
             for (Question *subquestion in children) {
-                NSNumber *subquestionId = [NSNumber numberWithInt:subquestion.questionId];
+                NSNumber *subquestionId = subquestion.questionId;
                 if (![visited containsObject:subquestionId]) {
                     [stack addObject:subquestion];
                 }
@@ -299,7 +299,7 @@
     
     NSMutableArray *result = [[NSMutableArray alloc] init];
     for (UserResponse *u in sectionUserResponses) {
-        if (u.parentId == q.questionId) {
+        if (u.parentId == [q.questionId intValue]) {
             [result addObject:u];
         }
     }
@@ -319,6 +319,7 @@
     return roots;
 }
 
+// create a dictionary with sections as keys and userResponses as values
 - (NSDictionary *)categorizeQuestions {
     NSMutableDictionary *categorizedQuestionAnswers = [[NSMutableDictionary alloc] init];
     
@@ -330,58 +331,29 @@
     NSArray *allQuestions = [self.questionsWithIds allValues];
     NSMutableArray *answeredQuestions = [[NSMutableArray alloc] init];
     for (Question *q in allQuestions) {
-        if ([self isQuestionAnswered:[NSNumber numberWithInt:q.questionId]]) {
+        if ([self isQuestionAnswered:q.questionId]) {
             [answeredQuestions addObject:q];
         }
     }
 
     for (Question *question in answeredQuestions) {
-        NSString *questionAnswer;
         UserResponse *userResponse = [[UserResponse alloc] init];
+        userResponse.questionLevel = question.questionLevel;
+        userResponse.questionText = question.questionText;
+        userResponse.parentId = question.questionParentId;
+        userResponse.questionId = [question.questionId intValue];
         
-        switch (question.questionType) {
-            case 0:
-            {
-                questionAnswer = [self prepareAnswerForSingleChoiceQuestion:question];
-                Answer *answer = [self.questionAndAnswers objectForKey:[NSNumber numberWithInt:question.questionId]];
-                userResponse.questionLevel = question.questionLevel;
-                userResponse.questionTextAndAnswerText = questionAnswer;
-                userResponse.questionText = question.questionText;
-                userResponse.parentId = question.questionParentId;
-                userResponse.answerText = answer.answerText;
-                userResponse.questionId = question.questionId;
-                userResponse.answer = answer;
-                break;
-            }
-            case 1:
-            {
-                questionAnswer = [self prepareAnswerForMultipleChoiceQuestion:question];
-                NSArray *answers = [self.questionAndAnswers objectForKey:[NSNumber numberWithInt:question.questionId]];
-                userResponse.questionLevel = question.questionLevel;
-                userResponse.questionTextAndAnswerText = questionAnswer;
-                userResponse.questionText = question.questionText;
-                userResponse.parentId = question.questionParentId;
-                NSString *combinedAnswer = [answers componentsJoinedByString:@","];
-                userResponse.answerText = combinedAnswer;
-                userResponse.questionId = question.questionId;
-                userResponse.answer = answers;
-                break;
-            }
-            case 2:
-            {
-                questionAnswer = [self prepareAnswerForSingleChoiceQuestion:question];
-                userResponse.questionLevel = question.questionLevel;
-                userResponse.questionTextAndAnswerText = questionAnswer;
-                userResponse.questionText = question.questionText;
-                userResponse.parentId = question.questionParentId;
-                Answer *answer = [self.questionAndAnswers objectForKey:[NSNumber numberWithInt:question.questionId]];
-                userResponse.answerText = answer.answerText;
-                userResponse.questionId = question.questionId;
-                break;
-            }
-            default:
-                NSLog(@"Error - Unrecognized question type");
-                break;
+        if (question.questionType == 0 || question.questionType == 2) {
+            Answer *answer = [self.questionAndAnswers objectForKey:question.questionId];
+            userResponse.questionTextAndAnswerText = [self prepareAnswerForSingleChoiceQuestion:question];
+            userResponse.answerText = answer.answerText;
+            userResponse.answer = answer;
+        } else if (question.questionType == 1) {
+            NSArray *answers = [self.questionAndAnswers objectForKey:question.questionId];
+            userResponse.questionTextAndAnswerText = [self prepareAnswerForMultipleChoiceQuestion:question];
+            NSString *combinedAnswer = [answers componentsJoinedByString:@","];
+            userResponse.answerText = combinedAnswer;
+            userResponse.answer = answers;
         }
         
         NSMutableArray *sectionQuestionAnswers = [categorizedQuestionAnswers valueForKey:question.questionSection];
@@ -392,13 +364,13 @@
 }
 
 - (NSString *)prepareAnswerForSingleChoiceQuestion:(Question *)question {
-    Answer *answer = [self.questionAndAnswers objectForKey:[NSNumber numberWithInt:question.questionId]];
+    Answer *answer = [self.questionAndAnswers objectForKey:question.questionId];
     NSString *result = [NSString stringWithFormat:@"%@\nYou answered: %@\n", question.questionText, answer.answerText];
     return result;
 }
 
 - (NSString *)prepareAnswerForMultipleChoiceQuestion:(Question *)question {
-    NSArray *answers = [self.questionAndAnswers objectForKey:[NSNumber numberWithInt:question.questionId]];
+    NSArray *answers = [self.questionAndAnswers objectForKey:question.questionId];
     NSMutableString *result = [NSMutableString stringWithFormat:@"%@\nYou replied:\n", question.questionText];
     for (Answer *a in answers) {
         [result appendString:[NSString stringWithFormat:@"%@\n", a.answerText]];
@@ -422,7 +394,7 @@
     
     NSMutableArray *subquestionIds = [[NSMutableArray alloc] init];
     for (Question *q in subquestions) {
-        NSNumber *subquestionId = [NSNumber numberWithInt:q.questionId];
+        NSNumber *subquestionId = q.questionId;
         [subquestionIds addObject:subquestionId];
         [self removeSubquestionsforQuestion:subquestionId withNewAnswer:nil];
     }
@@ -434,19 +406,28 @@
     NSArray *oldAnswers = [self.questionAndAnswers objectForKey:questionId];
     
     Question *question = [self.questionsWithIds objectForKey:questionId];
-    NSArray *subquestions = [[DataManager defaultDataManager] fetchSubquestionsOfQuestion:question forAnswers:oldAnswers];
-    if ([subquestions count] == 0) {
+    
+    NSArray *newSubquestions = [[DataManager defaultDataManager] fetchSubquestionsOfQuestion:question forAnswers:newAnswers];
+    NSMutableSet *newSubquestionIds = [[NSMutableSet alloc] init];
+    for (Question *newSubquestion in newSubquestions) {
+        [newSubquestionIds addObject:newSubquestion.questionId];
+    }
+    
+    NSArray *oldSubquestions = [[DataManager defaultDataManager] fetchSubquestionsOfQuestion:question forAnswers:oldAnswers];
+    if ([oldSubquestions count] == 0) {
         return;
     }
     
     NSMutableArray *subquestionIds = [[NSMutableArray alloc] init];
-    for (Question *q in subquestions) {
-        NSNumber *subquestionId = [NSNumber numberWithInt:q.questionId];
-        [subquestionIds addObject:subquestionId];
-        if (q.questionType == 0) {
-            [self removeSubquestionsforQuestion:subquestionId withNewAnswer:nil];
-        } else {
-            [self removeSubquestionsforQuestion:subquestionId withNewAnswers:nil];
+    for (Question *q in oldSubquestions) {
+        NSNumber *subquestionId = q.questionId;
+        if (![newSubquestionIds containsObject:subquestionId]) {
+            [subquestionIds addObject:subquestionId];
+            if (q.questionType == 0) {
+                [self removeSubquestionsforQuestion:subquestionId withNewAnswer:nil];
+            } else if (q.questionType == 1) {
+                [self removeSubquestionsforQuestion:subquestionId withNewAnswers:nil];
+            }
         }
     }
     
