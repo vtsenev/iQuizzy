@@ -125,7 +125,10 @@
         NSArray *questions = [self.openQuestions valueForKey:section];
         if (questions) {
             questionsTableViewController.tableData = [NSMutableArray arrayWithArray:questions];
+            NSLog(@"+++++++++++++++++\nCategory\nAnsweres For Scetion: %@", self.answersForSection); 
             questionsTableViewController.answers = [self.answersForSection valueForKey:section];
+
+            NSLog(@"+++++++++++++++++\nCategory\nAnsweres: %@", questionsTableViewController.answers);
             
             NSLog(@"Answers %@", [self.answersForSection valueForKey:section]);
         }
@@ -180,6 +183,7 @@
 
 - (void)initializeQuestionsAndAnswers {
     UserChoices *userChoices = [[[DataManager defaultDataManager] quizToUserChoices] objectForKey:self.quiz.quizId];
+    NSLog(@"==========================\nCategory::initializeQuestionAndAnswers\n%@",[[[[DataManager defaultDataManager] quizToUserChoices] objectForKey:self.quiz.quizId] questionAndAnswers]);
     
     if (userChoices) {
         NSMutableDictionary *testDict = userChoices.questionAndAnswers;
@@ -202,6 +206,10 @@
 - (void) didSubmitQuestions:(NSArray *)questions withAnswers:(NSDictionary *)answers forSection:(NSString *)section {
     [self.openQuestions setValue:questions forKey:section];
     [self.answersForSection setValue:answers forKey:section];
+    
+    NSLog(@"Answers %@", answers);
+    NSLog(@"AnswersForSection %@", self.answersForSection);
+    
 }
 
 @end

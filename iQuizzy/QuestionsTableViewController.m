@@ -194,10 +194,9 @@
         
         for (Answer *a in theAnswers) {
             [[DataManager defaultDataManager] insertAnswer:a forQuestion:question forQuizId:self.quiz.quizId];
-
         }
     }
-    
+
     NSUInteger index = self.questionIndex + 1;
     for (Question *q in subquestions) {
         [self.tableData insertObject:q atIndex:index];

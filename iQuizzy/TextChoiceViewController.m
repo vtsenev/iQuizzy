@@ -79,11 +79,13 @@
 #pragma mark - IBAction Methods
 
 - (IBAction)submitTextChoice:(id)sender {
-    Answer *answer = [[Answer alloc] init];
+    
+    NSInteger answerForQuestionId = [[DataManager defaultDataManager] insertAnsweredQuestion:question forQuizId:self.quiz.quizId];
+    [[DataManager defaultDataManager] deleteRowId:answerForQuestionId forColumn:@"AnswerForQuestionId" fromTable:@"AnswerForQuestion"];
 
+    Answer *answer = [[Answer alloc] init];
     answer.answerText = self.answerTextView.text;
     answer.answerId = [[DataManager defaultDataManager] insertAnswer:answer];
-    
     [[DataManager defaultDataManager] insertAnswer:answer forQuestion:self.question forQuizId:quiz.quizId];
 
     if([self.delegate respondsToSelector:@selector(didSubmitTextAnswer:forQuestion:)]) {

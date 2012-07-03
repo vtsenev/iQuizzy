@@ -43,8 +43,8 @@
 - (void)deleteQuizWithId:(NSNumber *)quizId;
 - (void)deleteRowId:(NSInteger)rowId forColumn:(NSString *)column fromTable:(NSString *)table;
 
-- (BOOL) isRowId:(NSInteger)rowId forColumn:(NSString *)column inTable:(NSString *)table;
-- (BOOL) isQuestionId:(NSInteger)questionId andQuizId:(NSInteger)quizId;
+- (BOOL) isExistRowId:(NSInteger)rowId forColumn:(NSString *)column InTable:(NSString *)table;
+- (BOOL) isExistQuestionId:(NSInteger)questionId andQuizId:(NSInteger)quizId;
 
 - (void)closeDB;
 
