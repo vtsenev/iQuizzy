@@ -176,28 +176,34 @@
         [self removeAllSubquestionsOfQuestion:question];
     }
     
-    if (question.questionType == 0) {
-        Answer *answer = (Answer *)answerObject;
-        [self.answers setValue:answer.answerText forKey:question.questionText];
-        [[DataManager defaultDataManager] insertAnswer:answer forQuestion:question forQuizId:self.quiz.quizId];
-        [[DataManager defaultDataManager] addAnswers:answerObject forQuestion:[NSNumber numberWithInt:question.questionId] forQuizId:self.quiz.quizId];
-        
-    } else if (question.questionType == 1) {
-        
-        NSInteger answerForQuestionId = [[DataManager defaultDataManager] insertAnsweredQuestion:question forQuizId:self.quiz.quizId];
-        [[DataManager defaultDataManager] deleteRowId:answerForQuestionId forColumn:@"AnswerForQuestionId" fromTable:@"AnswerForQuestion"];
-        [[DataManager defaultDataManager] addAnswers:answerObject forQuestion:[NSNumber numberWithInt:question.questionId] forQuizId:self.quiz.quizId];
-        
-        NSArray *theAnswers = (NSArray *)answerObject;
-        NSString *concatenatedAnswers = [theAnswers componentsJoinedByString: @", "];
-        [self.answers setValue:concatenatedAnswers forKey:question.questionText];
-        
-        for (Answer *a in theAnswers) {
-            [[DataManager defaultDataManager] insertAnswer:a forQuestion:question forQuizId:self.quiz.quizId];
-
+    switch (question.questionType) {
+        case 0:
+        {
+            Answer *answer = (Answer *)answerObject;
+            [self.answers setValue:answer.answerText forKey:question.questionText];
+            [[DataManager defaultDataManager] insertAnswer:answer forQuestion:question forQuizId:self.quiz.quizId];
+            [[DataManager defaultDataManager] addAnswers:answerObject forQuestion:[NSNumber numberWithInt:question.questionId] forQuizId:self.quiz.quizId];
+            break;
+        }
+            
+        case 1:
+        {
+            NSInteger answerForQuestionId = [[DataManager defaultDataManager] insertAnsweredQuestion:question forQuizId:self.quiz.quizId];
+            [[DataManager defaultDataManager] deleteRowId:answerForQuestionId forColumn:@"AnswerForQuestionId" fromTable:@"AnswerForQuestion"];
+            [[DataManager defaultDataManager] addAnswers:answerObject forQuestion:[NSNumber numberWithInt:question.questionId] forQuizId:self.quiz.quizId];
+            
+            NSArray *theAnswers = (NSArray *)answerObject;
+            NSString *concatenatedAnswers = [theAnswers componentsJoinedByString: @", "];
+            [self.answers setValue:concatenatedAnswers forKey:question.questionText];
+            
+            for (Answer *a in theAnswers) {
+                [[DataManager defaultDataManager] insertAnswer:a forQuestion:question forQuizId:self.quiz.quizId];
+                
+            }
+            break;
         }
     }
-    
+
     NSUInteger index = self.questionIndex + 1;
     for (Question *q in subquestions) {
         [self.tableData insertObject:q atIndex:index];

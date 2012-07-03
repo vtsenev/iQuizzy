@@ -480,8 +480,8 @@ static DataManager *defaultDataManager = nil;
 
 - (void)insertAnswer:(Answer *)answer forQuestion:(Question *)question forQuizId:(NSNumber *)quizId {
     NSInteger answerForQuestionId = [self insertAnsweredQuestion:question forQuizId:quizId];
-    
-    NSString* queryStr;    
+
+    NSString* queryStr;
     queryStr = [NSString stringWithFormat:@"INSERT INTO AnswerForQuestion(AnswerForQuestionId, AnswerId)  VALUES (\"%d\", \"%d\")",
                 answerForQuestionId, answer.answerId];
     
@@ -491,9 +491,6 @@ static DataManager *defaultDataManager = nil;
         if(question.questionType == 0){ 
             queryStr = [NSString stringWithFormat:@"UPDATE AnswerForQuestion SET AnswerId = %d WHERE AnswerForQuestionId = %d",
                         answer.answerId, answerForQuestionId];
-        }
-        else if(question.questionType == 2){
-                
         }
     }
     
